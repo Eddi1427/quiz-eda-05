@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Quiz EDA N.º 05 — Espacios Seguros. I.E.E. José de San Martín, Quinto Año.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Quiz Gamificado — EDA N.º 05: Espacios Seguros</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; min-height:100vh; color:#f8fbff;
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:
+      radial-gradient(circle at 10% 15%,rgba(0,255,255,.24),transparent 25%),
+      radial-gradient(circle at 90% 20%,rgba(255,0,255,.25),transparent 27%),
+      radial-gradient(circle at 25% 90%,rgba(255,255,0,.16),transparent 25%),
+      linear-gradient(-45deg,#050014,#071b3a,#17002d,#002b36,#120022);
+    background-size:140% 140%,140% 140%,140% 140%,500% 500%;
+    animation:bg 14s ease infinite;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+    background-image:linear-gradient(rgba(0,255,255,.035) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,0,255,.035) 1px,transparent 1px);
+    background-size:42px 42px;
+    mask-image:linear-gradient(to bottom,transparent,black 20%,black 80%,transparent);
+  }
+  @keyframes bg{0%{background-position:0% 50%,100% 20%,20% 100%,0% 50%}50%{background-position:100% 30%,0% 80%,80% 10%,100% 50%}100%{background-position:0% 50%,100% 20%,20% 100%,0% 50%}}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:#07111f}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(#60a5fa,#a78bfa);border-radius:99px}
+  .glass{
+    background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.045));
+    border:1px solid rgba(255,255,255,.28);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    box-shadow:0 0 35px rgba(0,255,255,.08),0 18px 55px rgba(0,0,0,.34);
+  }
+  .glass-soft{
+    background:rgba(255,255,255,.075);
+    border:1px solid rgba(255,255,255,.18);
+    backdrop-filter:blur(15px);
+  }
+  .neon-cyan{box-shadow:0 0 10px #00ffff,0 0 30px rgba(0,255,255,.55)}
+  .neon-pink{box-shadow:0 0 10px #ff00e6,0 0 30px rgba(255,0,230,.45)}
+  .neon-lime{box-shadow:0 0 10px #b7ff00,0 0 28px rgba(183,255,0,.42)}
+  .btn{transition:.2s transform,.2s box-shadow,.2s opacity}.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.25)}.btn:active{transform:scale(.98)}
+  .avatar{filter:grayscale(1);transform:scale(.92);transition:.2s}.avatar.selected{filter:grayscale(0);transform:scale(1.25);text-shadow:0 0 22px rgba(255,255,255,.8)}
+  .section-btn{
+    color:#e8fbff;
+    background:rgba(0,255,255,.06);
+    border:1px solid rgba(0,255,255,.35);
+    transition:.2s;
+  }
+  .section-btn:hover{transform:translateY(-2px);background:rgba(255,0,230,.16);border-color:#ff35e8;box-shadow:0 0 16px rgba(255,0,230,.5)}
+  .section-btn.selected-section{
+    color:#07111f;
+    background:linear-gradient(135deg,#00ffff,#b7ff00);
+    border-color:#ffffff;
+    box-shadow:0 0 10px #00ffff,0 0 25px rgba(183,255,0,.6);
+    transform:scale(1.04);
+  }
+  .option{transition:.18s}.option:hover:not(:disabled){transform:translateX(3px);background:rgba(255,255,255,.14)}
+  .correct{background:rgba(34,197,94,.28)!important;border-color:rgba(134,239,172,.75)!important}
+  .wrong{background:rgba(239,68,68,.30)!important;border-color:rgba(252,165,165,.8)!important}
+  .disabled{opacity:.82;cursor:not-allowed}
+  .fire{animation:fire 1s infinite alternate}.pulse{animation:pulse 1.5s infinite}
+  @keyframes fire{from{transform:scale(1) rotate(-4deg)}to{transform:scale(1.25) rotate(4deg)}}
+  @keyframes pulse{50%{box-shadow:0 0 0 10px rgba(96,165,250,.0)}}
+  .theory-paper{background:#fff;color:#111827;font-family:"Times New Roman",Times,serif}
+  .theory-paper h1,.theory-paper h2,.theory-paper h3{font-family:"Times New Roman",Times,serif}
+  .smart-highlight{background:#fff3a3!important;box-shadow:0 0 0 5px #fde047,0 10px 35px rgba(234,179,8,.35);transition:background 1s,box-shadow 1s}
+  .fade-highlight{animation:fadeHi 3s forwards}
+  @keyframes fadeHi{0%,55%{background:#fff3a3;box-shadow:0 0 0 5px #fde047}100%{background:transparent;box-shadow:none}}
+  .modal-backdrop{background:rgba(2,6,23,.70);backdrop-filter:blur(7px)}
+  .hiddenx{display:none!important}
+  .rank-badge{background:linear-gradient(135deg,rgba(250,204,21,.25),rgba(167,139,250,.25));border:1px solid rgba(255,255,255,.25)}
+  table{border-collapse:collapse;width:100%} th,td{padding:.65rem .55rem;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}
+  .smallcaps{letter-spacing:.12em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div id="app" class="min-h-screen">
+  <!-- INICIO -->
+  <section id="startScreen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass max-w-5xl w-full rounded-3xl p-6 md:p-10">
+      <div class="text-center">
+        <div class="smallcaps text-cyan-200 text-xs md:text-sm">I.E.E. “JOSE DE SAN MARTIN” · QUINTO AÑO</div>
+        <h1 class="text-3xl md:text-5xl font-black mt-3">🛡️ Espacios Seguros</h1>
+        <p class="text-lg md:text-2xl font-semibold text-sky-200 mt-2">Figuras Geométricas y Cuerpos en el Espacio</p>
+        <p class="text-sm md:text-base text-slate-300 mt-3">EDA N.º 05 · Quiz interactivo gamificado y monitoreado</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-7 mt-9">
+        <div class="glass-soft rounded-2xl p-5">
+          <label class="block font-bold mb-2">👤 Apellidos y Nombres</label>
+          <input id="studentName" class="w-full rounded-xl bg-slate-950/40 border border-white/20 px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300" placeholder="Escribe tu nombre completo" autocomplete="name">
+
+          <div class="mt-5">
+            <label class="block font-bold mb-2">🏫 Selecciona tu sección</label>
+            <div id="sectionGrid" class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+              <button type="button" class="section-btn selected-section rounded-xl py-3 font-black" data-section="A">A</button>
+              <button type="button" class="section-btn rounded-xl py-3 font-black" data-section="B">B</button>
+              <button type="button" class="section-btn rounded-xl py-3 font-black" data-section="C">C</button>
+              <button type="button" class="section-btn rounded-xl py-3 font-black" data-section="D">D</button>
+              <button type="button" class="section-btn rounded-xl py-3 font-black" data-section="E">E</button>
+              <button type="button" class="section-btn rounded-xl py-3 font-black" data-section="F">F</button>
+              <button type="button" class="section-btn rounded-xl py-3 font-black" data-section="G">G</button>
+            </div>
+            <div class="text-xs text-cyan-200 mt-2">Sección seleccionada: <b id="selectedSectionText">A</b></div>
+          </div>
+
+          <div class="mt-6">
+            <p class="font-bold mb-3">🎭 Elige tu avatar</p>
+            <div id="avatarGrid" class="flex justify-center gap-4 text-4xl md:text-5xl">
+              <button class="avatar selected" data-avatar="🧑‍🎓" type="button">🧑‍🎓</button>
+              <button class="avatar" data-avatar="👩‍🎓" type="button">👩‍🎓</button>
+              <button class="avatar" data-avatar="👨‍🎓" type="button">👨‍🎓</button>
+              <button class="avatar" data-avatar="🧑‍🏫" type="button">🧑‍🏫</button>
+              <button class="avatar" data-avatar="🦸" type="button">🦸</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-soft rounded-2xl p-5 flex flex-col justify-center gap-4">
+          <button id="studyBtn" class="btn neon-cyan rounded-2xl bg-white text-slate-900 font-extrabold text-lg px-6 py-4">📖 Estudiar Teoría</button>
+          <button id="startBtn" class="btn neon-pink rounded-2xl bg-gradient-to-r from-fuchsia-500 via-violet-500 to-cyan-400 font-black text-xl px-6 py-5 shadow-xl">🚀 ¡Empezar Reto!</button>
+          <p class="text-xs text-slate-300 text-center">20 preguntas · 4 alternativas · sin temporizador · retroalimentación inmediata</p>
+        </div>
+      </div>
+      <button id="teacherBtn" class="block mx-auto mt-8 text-sm text-slate-300 hover:text-white underline underline-offset-4">🔐 Acceso Docente</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quizScreen" class="hiddenx min-h-screen p-3 md:p-6">
+    <div class="max-w-6xl mx-auto">
+      <header class="glass rounded-2xl p-3 md:p-4 sticky top-2 z-20">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span id="hudAvatar" class="text-3xl">🧑‍🎓</span>
+            <div><div id="hudName" class="font-black"></div><div id="progressText" class="text-xs text-slate-300"></div><div id="hudSection" class="text-xs font-bold text-lime-300"></div></div>
+          </div>
+          <div class="flex gap-3 md:gap-5 items-center text-sm md:text-base">
+            <div>⭐ <b id="scoreText">0</b> pts</div>
+            <div>🔥 <span id="streakText">0</span> <span id="fireIcon" class="hiddenx fire">🔥</span></div>
+          </div>
+          <div class="flex gap-2">
+            <button id="fiftyBtn" class="btn glass-soft rounded-xl px-3 py-2 font-bold">50/50</button>
+            <button id="hintBtn" class="btn glass-soft rounded-xl px-3 py-2 font-bold">💡 Pista</button>
+            <button id="theoryQuizBtn" class="btn bg-white text-slate-900 rounded-xl px-3 py-2 font-bold">📖 Ver Teoría</button>
+            <button id="quitBtn" class="btn bg-red-600/80 rounded-xl px-3 py-2 font-bold">Salir</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="mt-5">
+        <div class="glass rounded-3xl p-5 md:p-8">
+          <div class="flex justify-between items-center mb-4">
+            <span class="smallcaps text-cyan-200 text-xs">Reto de geometría y escala</span>
+            <span id="questionNumber" class="font-black text-slate-200"></span>
+          </div>
+          <h2 id="questionText" class="text-xl md:text-3xl font-extrabold leading-tight"></h2>
+          <div id="options" class="grid gap-3 mt-6"></div>
+          <div id="hintBox" class="hiddenx mt-5 rounded-2xl p-4 bg-amber-300/15 border border-amber-200/30 text-amber-100"></div>
+          <div id="feedback" class="hiddenx mt-6 rounded-2xl p-5"></div>
+          <button id="nextBtn" class="hiddenx btn mt-5 w-full md:w-auto rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-6 py-3 font-black">Siguiente ➜</button>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="resultScreen" class="hiddenx min-h-screen flex items-center justify-center p-4">
+    <div class="glass max-w-3xl w-full rounded-3xl p-7 md:p-10 text-center">
+      <div id="resultAvatar" class="text-7xl md:text-8xl"></div>
+      <h2 class="text-3xl md:text-5xl font-black mt-3">¡Reto completado!</h2>
+      <p id="resultName" class="text-xl text-slate-200 mt-2"></p><p id="resultSection" class="font-black text-lime-300 mt-1"></p>
+      <div class="grid md:grid-cols-3 gap-4 mt-8">
+        <div class="glass-soft rounded-2xl p-5"><div class="text-sm text-slate-300">Puntaje</div><div id="finalScore" class="text-3xl font-black">0</div></div>
+        <div class="glass-soft rounded-2xl p-5"><div class="text-sm text-slate-300">Precisión</div><div id="accuracy" class="text-3xl font-black">0%</div></div>
+        <div class="glass-soft rounded-2xl p-5"><div class="text-sm text-slate-300">Aciertos</div><div id="correctCount" class="text-3xl font-black">0/20</div></div>
+      </div>
+      <div class="mt-6"><span id="rankBadge" class="rank-badge inline-block rounded-full px-6 py-3 font-black text-xl"></span></div>
+      <div class="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+        <button id="copyReportBtn" class="btn rounded-xl bg-emerald-500/85 px-6 py-3 font-black">📋 Copiar Reporte</button>
+        <button id="homeBtn" class="btn rounded-xl bg-white text-slate-900 px-6 py-3 font-black">↩️ Volver al Inicio</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- THEORY MODAL -->
+<div id="theoryModal" class="hiddenx fixed inset-0 z-50 modal-backdrop p-2 md:p-6">
+  <div class="max-w-5xl h-full mx-auto flex items-center">
+    <div class="theory-paper rounded-xl w-full h-[96vh] shadow-2xl overflow-hidden flex flex-col">
+      <div class="sticky top-0 bg-white border-b border-slate-300 px-4 py-3 flex justify-between items-center z-10">
+        <div class="font-bold">📖 Tutor Inteligente — Ficha de teoría</div>
+        <button id="closeTheoryBtn" class="btn rounded-lg bg-slate-900 text-white px-4 py-2 font-bold">Cerrar ✕</button>
+      </div>
+      <article id="theoryContent" class="overflow-y-auto p-5 md:p-10 text-[16px] md:text-[18px] leading-relaxed">
+        <h1 class="text-3xl text-center font-bold">EDA N.º 05: “Espacios Seguros: Figuras Geométricas y Cuerpos en el Espacio”</h1>
+        <p class="text-center mt-2"><b>I.E.E. “JOSE DE SAN MARTIN” · Evaluación Matemática — Quinto Año</b></p>
+        <hr class="my-6">
+        <h2 class="text-2xl font-bold">1. Situación problemática retadora 1: Zona de Seguridad Externa Principal</h2>
+        <p>El Comité de Defensa Civil de la I.E.E. José de San Martín debe validar el aforo de la “Zona de Seguridad Externa Principal”. La figura está formada por un rectángulo de <b>48 m de largo</b> y <b>18 m de ancho</b>, coronado en sus dos extremos más cortos por <b>dos semicírculos perfectos</b>. Las normas indicadas en el material exigen un área mínima de <b>1,5 m² por estudiante</b>. Para cálculos aproximados se considera <b>π = 3,14</b>.</p>
+        <p><b>Reto:</b> modelar la figura, analizar su área y perímetro, validar el aforo y proponer ajustes geométricos cuando sea necesario.</p>
+
+        <section id="theory-q1" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Área total de la zona</h3>
+          <p>Los dos semicírculos equivalen a un círculo completo. Como el ancho es 18 m, el radio es <b>r = 9 m</b>. Entonces:</p>
+          <p class="text-center text-xl"><b>A = 48(18) + π(9²) = 864 + 81π</b></p>
+          <p>Con π = 3,14: <b>A = 864 + 254,34 = 1 118,34 m²</b>.</p>
+        </section>
+
+        <section id="theory-q3" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Aforo máximo</h3>
+          <p>Si cada estudiante requiere 1,5 m²:</p>
+          <p class="text-center text-xl"><b>Aforo = 1 118,34 ÷ 1,5 = 745,56...</b></p>
+          <p>Como no se puede superar el área disponible, se toma la parte entera: <b>745 personas</b>.</p>
+        </section>
+
+        <section id="theory-q4" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Comprobación de un grupo de 480 personas</h3>
+          <p>Total: <b>250 + 200 + 30 = 480 personas</b>.</p>
+          <p>Área requerida: <b>480 × 1,5 = 720 m²</b>. Como 720 &lt; 1 118,34, matemáticamente sí es posible.</p>
+        </section>
+
+        <section id="theory-q5" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Área libre</h3>
+          <p>Área ocupada por 480 personas: 720 m².</p>
+          <p><b>Área libre = 1 118,34 − 720 = 398,34 m²</b>.</p>
+        </section>
+
+        <section id="theory-q6" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Porcentaje de ocupación</h3>
+          <p>Se compara el área ocupada con el área total:</p>
+          <p class="text-center text-xl"><b>% ocupación = (720 ÷ 1 118,34) × 100 ≈ 64,38 %</b>.</p>
+        </section>
+
+        <section id="theory-q7" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Perímetro de la figura</h3>
+          <p>El perímetro está formado por los dos lados rectos del rectángulo y la circunferencia completa:</p>
+          <p class="text-center text-xl"><b>P = 2(48) + 2π(9)</b></p>
+          <p>Con π = 3,14: <b>P = 96 + 56,52 = 152,52 m</b>.</p>
+        </section>
+
+        <section id="theory-q8" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Capacidad para 600 personas</h3>
+          <p>Área necesaria: <b>600 × 1,5 = 900 m²</b>. Como 900 &lt; 1 118,34, la zona cumple. El margen es <b>1 118,34 − 900 = 218,34 m²</b>.</p>
+        </section>
+
+        <section id="theory-q9" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Modificación del largo</h3>
+          <p>Si el largo disminuye 6 m: <b>48 − 6 = 42 m</b>. Área rectangular: <b>42 × 18 = 756 m²</b>. Área total: <b>756 + 81(3,14) = 1 010,34 m²</b>. Capacidad: <b>1 010,34 ÷ 1,5 = 673,56...</b>, por lo que se consideran <b>673 personas</b>.</p>
+        </section>
+
+        <section id="theory-q10" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Ampliación para 800 personas</h3>
+          <p>Área necesaria: <b>800 × 1,5 = 1 200 m²</b>. Área del círculo: <b>81(3,14) = 254,34 m²</b>. Área rectangular necesaria: <b>1 200 − 254,34 = 945,66 m²</b>. Con ancho 18 m, el largo necesario es aproximadamente <b>52,54 m</b>; por tanto, el aumento respecto de 48 m es aproximadamente <b>4,54 m</b>.</p>
+        </section>
+
+        <h2 class="text-2xl font-bold mt-10">2. Problematización 02: “El desafío de los 972 metros: Trazando rutas seguras a escala real”</h2>
+        <p>La I.E.E. José de San Martín en Pisco se ubica en una zona altamente sísmica. El material plantea utilizar geometría, escalas y el plano satelital para determinar matemáticamente una ruta de evacuación desde las aulas hasta el campo de fútbol verde, justificando el descarte de infraestructuras como el coliseo techado y demostrando numéricamente que el área verde elegida garantiza el aforo de seguridad.</p>
+        <p>Datos del plano: <b>AB = 2,1 cm</b>, <b>BC = 4,3 cm</b>, <b>AD = 5 cm</b> y <b>perímetro del plano = 29,52 cm</b>. El perímetro real es <b>972 m</b>. Además, <b>1 ha = 10 000 m²</b>.</p>
+
+        <section id="theory-q11" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Conversión mediante escala</h3>
+          <p>Si 29,52 cm en el plano corresponden a 972 m reales:</p>
+          <p class="text-center text-xl"><b>972 ÷ 29,52 ≈ 32,93 m por cada cm del plano</b>.</p>
+        </section>
+
+        <section id="theory-q12" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Escala como razón 1:n</h3>
+          <p>Como 1 cm del plano representa aproximadamente 32,93 m, se convierten metros a centímetros: 32,93 m = 3 292,68 cm. Por tanto, la escala aproximada es <b>1 : 3 292,68</b>.</p>
+        </section>
+
+        <section id="theory-q13" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Longitud real de AB</h3>
+          <p><b>AB = 2,1 × 32,9268... ≈ 69,15 m</b>.</p>
+        </section>
+
+        <section id="theory-q14" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Ruta A → B → C</h3>
+          <p>En el plano: <b>2,1 + 4,3 = 6,4 cm</b>. En la realidad: <b>6,4 × 32,9268... ≈ 210,73 m</b>.</p>
+        </section>
+
+        <section id="theory-q15" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Ruta A → D</h3>
+          <p><b>AD = 5 × 32,9268... ≈ 164,63 m</b>. Comparada con AB, la diferencia es <b>164,63 − 69,15 ≈ 95,49 m</b>.</p>
+        </section>
+
+        <section id="theory-q16" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Tiempo de recorrido</h3>
+          <p>Para A → B → C, la distancia real es aproximadamente 210,73 m. A una velocidad constante de 50 m/min:</p>
+          <p class="text-center text-xl"><b>t = 210,73 ÷ 50 ≈ 4,2146 min ≈ 4 min 13 s</b>.</p>
+        </section>
+
+        <section id="theory-q17" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Porcentaje del perímetro</h3>
+          <p>Ruta A → B → C en el plano: 6,4 cm. Perímetro del plano: 29,52 cm.</p>
+          <p class="text-center text-xl"><b>(6,4 ÷ 29,52) × 100 ≈ 21,68 %</b>.</p>
+        </section>
+
+        <section id="theory-q18" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Área de la escuela en el plano</h3>
+          <p>La escuela tiene <b>5,46 ha = 54 600 m²</b>. Si 1 cm representa k metros, 1 cm² representa k² m². Por ello:</p>
+          <p class="text-center text-xl"><b>A<sub>plano</sub> = 54 600 ÷ (32,9268...)² ≈ 50,36 cm²</b>.</p>
+        </section>
+
+        <section id="theory-q19" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Comparación de recorridos</h3>
+          <p>A → B → C ≈ 210,73 m y A → D ≈ 164,63 m. Diferencia: <b>210,73 − 164,63 ≈ 46,10 m</b>.</p>
+        </section>
+
+        <section id="theory-q20" class="mt-6 p-4 rounded-lg">
+          <h3 class="text-xl font-bold">Diseñar un recorrido de 200 m</h3>
+          <p>Con la misma escala:</p>
+          <p class="text-center text-xl"><b>200 ÷ 32,9268... ≈ 6,07 cm</b>.</p>
+          <p>Porcentaje del perímetro: <b>(6,07 ÷ 29,52) × 100 ≈ 20,56 %</b>.</p>
+        </section>
+
+        <div class="mt-10 border-t-2 border-slate-300 pt-5">
+          <h2 class="text-2xl font-bold">Claves del material original</h2>
+          <p><b>Situación 1:</b> 1 C, 2 B, 3 A, 4 C, 5 B, 6 D, 7 C, 8 A, 9 D, 10 B.</p>
+          <p><b>Situación 2:</b> 11 C, 12 D, 13 C, 14 C, 15 A, 16 B, 17 C, 18 C, 19 A, 20 B.</p>
+          <p class="text-sm mt-3">La ficha reproduce los datos, procedimientos y resultados que aparecen en la evaluación proporcionada.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM MODAL -->
+<div id="customModal" class="hiddenx fixed inset-0 z-[60] modal-backdrop flex items-center justify-center p-4">
+  <div class="glass max-w-lg w-full rounded-3xl p-6">
+    <div id="modalIcon" class="text-4xl"></div>
+    <h3 id="modalTitle" class="text-2xl font-black mt-2"></h3>
+    <div id="modalMessage" class="mt-3 text-slate-200 whitespace-pre-wrap"></div>
+    <div id="modalInputWrap" class="hiddenx mt-4"><input id="modalInput" class="w-full rounded-xl bg-slate-950/50 border border-white/20 px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-300" type="password"></div>
+    <div class="flex justify-end gap-3 mt-6">
+      <button id="modalCancel" class="btn rounded-xl bg-white/10 px-5 py-2.5 font-bold">Cancelar</button>
+      <button id="modalOk" class="btn rounded-xl bg-cyan-500 px-5 py-2.5 font-black">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHER -->
+<div id="teacherModal" class="hiddenx fixed inset-0 z-[55] modal-backdrop p-3 md:p-6">
+  <div class="max-w-6xl mx-auto h-full flex items-center">
+    <div class="glass rounded-3xl w-full max-h-[94vh] overflow-auto p-5 md:p-7">
+      <div class="flex flex-wrap justify-between items-center gap-3">
+        <div><div class="smallcaps text-cyan-200 text-xs">Panel Docente</div><h2 class="text-2xl md:text-3xl font-black">📊 Seguimiento de estudiantes</h2></div>
+        <div class="flex gap-2"><button id="clearRecordsBtn" class="btn rounded-xl bg-red-600/80 px-4 py-2 font-bold">🗑️ Borrar registros</button><button id="closeTeacherBtn" class="btn rounded-xl bg-white text-slate-900 px-4 py-2 font-bold">Cerrar ✕</button></div>
+      </div>
+      <p class="text-sm text-slate-300 mt-3">Sistema híbrido: usa Firebase si existe una configuración válida en <code>window.FIREBASE_CONFIG</code>; de lo contrario funciona con localStorage.</p>
+      <div class="overflow-x-auto mt-5"><table><thead><tr><th>Estado</th><th>Estudiante</th><th>Sección</th><th>Avatar</th><th>Puntaje</th><th>Aciertos</th><th>Precisión</th><th>Inicio</th><th>Duración</th></tr></thead><tbody id="recordsBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase es opcional: si la institución define window.FIREBASE_CONFIG, el adaptador usa Firestore.
+     Si no hay conexión o configuración, la aplicación continúa funcionando con localStorage. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+/* =========================
+   CONFIGURACIÓN OPCIONAL FIREBASE
+   Para usar Firebase, antes de este script se puede definir:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."};
+   El modo local funciona automáticamente si no existe configuración.
+========================= */
+const QUESTIONS = [
+ {q:"¿Cuál es la expresión exacta que modela el área total de la zona de seguridad?",o:["48(18) + 18π","48(18) + 9π","48(18) + 81π","2(48)(18) + 81π"],a:2,h:"Los dos semicírculos forman un círculo completo y su radio es 9 m.",e:"El rectángulo tiene área 48×18 = 864 m². Los dos semicírculos equivalen a un círculo de radio 9 m, cuya área es 81π. Por tanto, A = 48(18)+81π.",ref:"theory-q1"},
+ {q:"Usando π = 3,14, ¿cuál es aproximadamente el área total disponible?",o:["1 064,34 m²","1 118,34 m²","1 126,34 m²","1 154,52 m²"],a:1,h:"Primero calcula 864 y luego 81×3,14.",e:"A = 864 + 81(3,14) = 864 + 254,34 = 1 118,34 m².",ref:"theory-q1"},
+ {q:"Si se exige 1,5 m² por estudiante, ¿cuál es el número máximo de estudiantes que puede albergar la zona?",o:["745","746","747","750"],a:0,h:"Divide el área total entre 1,5 y toma la parte entera.",e:"1 118,34 ÷ 1,5 = 745,56... Como no se puede superar el área disponible, el aforo máximo indicado es 745 personas.",ref:"theory-q3"},
+ {q:"Se desea evacuar simultáneamente a 250 estudiantes de 5.º, 200 de 4.º y 30 docentes. ¿Es matemáticamente posible?",o:["No, faltan 15 m².","No, faltan 25 estudiantes de capacidad.","Sí, caben 745 personas y sobran 265 plazas.","Sí, pero solo si se usa el área semicircular."],a:2,h:"Suma las personas y compara el área requerida con el área total.",e:"250+200+30=480 personas. Requieren 480×1,5=720 m². Como 720<1 118,34, sí es posible. Frente al aforo 745, sobran 745−480=265 plazas.",ref:"theory-q4"},
+ {q:"Si ingresan las 480 personas indicadas en el reto anterior, ¿qué área libre queda, aproximadamente?",o:["326,34 m²","398,34 m²","408,34 m²","438,34 m²"],a:1,h:"Resta el área ocupada por 480 personas al área total.",e:"Área ocupada = 480×1,5 = 720 m². Área libre = 1 118,34−720 = 398,34 m².",ref:"theory-q5"},
+ {q:"¿Qué porcentaje aproximado del área total queda ocupado cuando se ubican las 480 personas a razón de 1,5 m² por persona?",o:["42,86 %","50,00 %","60,00 %","64,38 %"],a:3,h:"Compara 720 m² con 1 118,34 m² y multiplica por 100.",e:"El porcentaje es (720÷1 118,34)×100 ≈ 64,38 %.",ref:"theory-q6"},
+ {q:"¿Cuál es el perímetro aproximado de la figura, considerando π = 3,14?",o:["136,52 m","144,00 m","152,52 m","160,52 m"],a:2,h:"Usa los dos lados rectos de 48 m y una circunferencia de radio 9 m.",e:"P = 2(48)+2π(9)=96+56,52=152,52 m.",ref:"theory-q7"},
+ {q:"Si en una jornada se requiere espacio para 600 personas, ¿la zona cumple el mínimo de 1,5 m² por persona? ¿Cuánto margen de área queda?",o:["Sí; quedan 218,34 m².","Sí; quedan 118,34 m².","No; faltan 81,66 m².","No; faltan 100 m²."],a:0,h:"600 personas requieren 900 m².",e:"Área necesaria = 600×1,5=900 m². Como 900<1 118,34, sí cumple. Margen = 1 118,34−900=218,34 m².",ref:"theory-q8"},
+ {q:"Si el largo del rectángulo disminuye 6 m, mientras el ancho y los semicírculos permanecen iguales, ¿cuál sería la nueva capacidad máxima?",o:["640 personas","650 personas","667 personas","673 personas"],a:3,h:"El nuevo largo es 48−6=42 m.",e:"Área rectangular = 42×18=756 m². Área total = 756+81(3,14)=1 010,34 m². Capacidad = 1 010,34÷1,5=673,56..., por lo que se toman 673 personas.",ref:"theory-q9"},
+ {q:"Si se quisiera ampliar la zona para que pudiera albergar a 800 personas manteniendo el ancho de 18 m y el radio de 9 m, ¿en cuánto se debería aumentar aproximadamente el largo del rectángulo?",o:["8,54 m","4,54 m","54,00 m","56,50 m"],a:1,h:"Calcula 1 200 m² de área requerida y descuenta 254,34 m² del círculo.",e:"800×1,5=1 200 m². Área rectangular necesaria = 1 200−254,34=945,66 m². Con ancho 18 m, el largo necesario es aproximadamente 52,54 m; respecto de 48 m, el aumento es aproximadamente 4,54 m.",ref:"theory-q10"},
+ {q:"A partir del perímetro real y del perímetro del plano, ¿cuántos metros reales representa 1 cm en el plano?",o:["29,52 m","30,00 m","32,93 m","34,86 m"],a:2,h:"Divide 972 m entre 29,52 cm.",e:"972÷29,52 ≈ 32,93. Por tanto, 1 cm del plano representa aproximadamente 32,93 m reales.",ref:"theory-q11"},
+ {q:"¿Cuál es la escala aproximada del plano expresada como razón 1:n, tomando centímetros en ambos lados?",o:["1 : 972","1 : 2 952","1 : 3 000","1 : 3 292,68"],a:3,h:"Convierte 32,93 m a centímetros antes de expresar la razón.",e:"32,93 m = aproximadamente 3 292,68 cm. Por tanto, la escala aproximada es 1 : 3 292,68.",ref:"theory-q12"},
+ {q:"La ruta directa entre A y B mide 2,1 cm en el plano. ¿Cuál es su longitud real aproximada?",o:["59,15 m","64,68 m","69,15 m","72,93 m"],a:2,h:"Multiplica 2,1 cm por los aproximadamente 32,9268 m que representa cada centímetro.",e:"AB = 2,1×32,9268... = 69,1463... m ≈ 69,15 m.",ref:"theory-q13"},
+ {q:"Si una ruta sigue A → B → C, ¿cuál es la distancia real total recorrida?",o:["196,44 m","205,73 m","210,73 m","214,52 m"],a:2,h:"En el plano suma AB y BC: 2,1+4,3.",e:"La ruta mide 6,4 cm en el plano. 6,4×32,9268... ≈ 210,73 m.",ref:"theory-q14"},
+ {q:"La ruta A → D mide 5 cm en el plano. ¿Cuántos metros reales representa y cuánto más larga es que AB?",o:["164,63 m y 95,49 m","150,00 m y 80,85 m","169,63 m y 100,48 m","172,50 m y 102,50 m"],a:0,h:"Convierte AD con la escala y resta la longitud de AB.",e:"AD=5×32,9268...≈164,63 m. La diferencia con AB≈69,15 m es 164,63−69,15≈95,49 m.",ref:"theory-q15"},
+ {q:"Si un estudiante debe recorrer A → B → C y camina a una velocidad constante de 50 m/min, ¿cuánto tiempo tardaría aproximadamente?",o:["3 min 12 s","4 min 13 s","4 min 42 s","5 min 10 s"],a:1,h:"Usa tiempo = distancia ÷ velocidad.",e:"t≈210,73÷50≈4,2146 min. La parte decimal 0,2146×60≈12,88 s, por lo que son aproximadamente 4 min 13 s.",ref:"theory-q16"},
+ {q:"¿Qué porcentaje del perímetro del plano representa la ruta A → B → C?",o:["18,20 %","20,15 %","21,68 %","23,45 %"],a:2,h:"Divide 6,4 cm entre el perímetro del plano 29,52 cm y multiplica por 100.",e:"(6,4÷29,52)×100≈21,68 %.",ref:"theory-q17"},
+ {q:"La escuela tiene 5,46 hectáreas. Si se representa toda esa superficie en el mismo plano y se conserva la escala obtenida a partir del perímetro, ¿qué área aproximada tendría la escuela dibujada en el plano?",o:["42,60 cm²","48,72 cm²","50,36 cm²","54,60 cm²"],a:2,h:"Convierte 5,46 ha a 54 600 m² y divide entre el cuadrado de la escala lineal.",e:"5,46 ha=54 600 m². Como 1 cm representa 32,9268... m, 1 cm² representa (32,9268...)² m². A≈54 600÷(32,9268...)²≈50,36 cm².",ref:"theory-q18"},
+ {q:"Para una evacuación, se quiere comparar dos recorridos: A → B → C y A → D. ¿Cuál es la diferencia aproximada entre sus longitudes reales y qué recorrido es más corto?",o:["46,10 m; A → D es más corto","46,10 m; A → B → C es más corto","53,90 m; A → D es más corto","53,90 m; A → B → C es más corto"],a:0,h:"Compara aproximadamente 210,73 m con 164,63 m.",e:"La diferencia es 210,73−164,63≈46,10 m. El recorrido A→D tiene menor longitud que A→B→C.",ref:"theory-q19"},
+ {q:"Si se quisiera que el tramo A → B → C representara exactamente 200 m reales, manteniendo la misma escala, ¿cuántos centímetros debería medir ese recorrido en el plano y qué porcentaje del perímetro del plano representaría?",o:["5,76 cm y 19,51 %","6,07 cm y 20,56 %","6,40 cm y 21,68 %","6,75 cm y 22,86 %"],a:1,h:"Divide 200 m entre 32,9268... m/cm y luego compara los centímetros obtenidos con 29,52 cm.",e:"Longitud en el plano = 200÷32,9268...≈6,07 cm. Porcentaje = (6,07÷29,52)×100≈20,56 %.",ref:"theory-q20"}
+];
+
+let state={name:"",section:"A",avatar:"🧑‍🎓",index:0,score:0,streak:0,correct:0,answers:[],startedAt:null,recordId:null,ended:false};
+let records=[];
+const LS_KEY="eda05_quiz_records_v1";
+const GOOGLE_SHEETS_ENDPOINT="https://script.google.com/macros/s/AKfycbx9Idb3WLIKsPAeZe_KfSohSa4n3mGGeLCJS_vUBOUTmtBG01UN-HZtR9wLHx2uF3OCDA/exec";
+
+async function sendResultToGoogleSheets(record){
+  try{
+    const correctCount=Number(String(record.correct||"0/20").split("/")[0])||0;
+    const total=20;
+    const payload={
+      nombre:record.name||"",
+      seccion:record.section||"",
+      avatar:record.avatar||"",
+      puntaje:Number(record.score||0),
+      aciertos:correctCount,
+      errores:Math.max(0,total-correctCount),
+      porcentaje:Number(record.accuracy||0),
+      estado:record.status||""
+    };
+
+    // text/plain avoids a browser CORS preflight; Apps Script reads the JSON body.
+    await fetch(GOOGLE_SHEETS_ENDPOINT,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload),
+      mode:"no-cors"
+    });
+    return true;
+  }catch(err){
+    console.warn("No se pudo enviar el resultado a Google Sheets.",err);
+    return false;
+  }
+}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+function show(id){$(id).classList.remove("hiddenx")}
+function hide(id){$(id).classList.add("hiddenx")}
+
+function modal({title="Mensaje",message="",icon="💬",input=false,okText="Aceptar",cancel=true,type="info"}={}){
+  return new Promise(resolve=>{
+    $("modalTitle").textContent=title;$("modalMessage").textContent=message;$("modalIcon").textContent=icon;
+    $("modalOk").textContent=okText;$("modalInputWrap").classList.toggle("hiddenx",!input);
+    $("modalInput").value="";$("modalInput").type=type==="password"?"password":"text";
+    $("modalCancel").classList.toggle("hiddenx",!cancel);show("customModal");
+    const done=(ok)=>{hide("customModal");document.removeEventListener("keydown",key);resolve(ok?($("modalInput").value):null)}
+    const key=e=>{if(e.key==="Enter"){e.preventDefault();done(true)}else if(e.key==="Escape"&&cancel){done(false)}}
+    $("modalOk").onclick=()=>done(true);$("modalCancel").onclick=()=>done(false);document.addEventListener("keydown",key);
+    if(input)setTimeout(()=>$("modalInput").focus(),50)
+  })
+}
+function loadLocal(){try{records=JSON.parse(localStorage.getItem(LS_KEY)||"[]")}catch{records=[]}}
+function saveLocal(){localStorage.setItem(LS_KEY,JSON.stringify(records))}
+function durationText(ms){let s=Math.max(0,Math.floor(ms/1000));return `${Math.floor(s/60)} min ${String(s%60).padStart(2,"0")} s`}
+function nowText(d=new Date()){return d.toLocaleString("es-PE",{dateStyle:"short",timeStyle:"medium"})}
+function rank(p){if(p>=90)return"🏆 Leyenda";if(p>=75)return"🌟 Experto";if(p>=50)return"🚀 Avanzado";return"🌱 Novato"}
+
+async function hybridSave(record){
+  // Local persistence is always maintained as an offline safety net.
+  const i=records.findIndex(r=>r.id===record.id); if(i>=0)records[i]=record; else records.push(record); saveLocal();
+  // Optional Firebase REST/compat hook: if app was configured by the institution.
+  if(window.firebase && window.FIREBASE_CONFIG){
+    try{
+      if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+      if(firebase.firestore){
+        await firebase.firestore().collection("quizRecords").doc(record.id).set(record,{merge:true});
+      }
+    }catch(err){console.warn("Firebase no disponible; se conserva localStorage.",err)}
+  }
+}
+async function hybridDeleteAll(){
+  records=[];saveLocal();
+  if(window.firebase && window.FIREBASE_CONFIG){
+    try{
+      if(!firebase.apps.length)firebase.initializeApp(window.FIREBASE_CONFIG);
+      // Deletion from Firestore is intentionally not automatic here because
+      // institutions may have security rules requiring server-side batch deletion.
+    }catch{}
+  }
+}
+async function startGame(){
+  const name=$("studentName").value.trim();
+  if(!name){await modal({title:"Falta tu nombre",message:"Escribe tus Apellidos y Nombres para comenzar.",icon:"👤"});return}
+  state={name,section:state.section,avatar:state.avatar,index:0,score:0,streak:0,correct:0,answers:[],startedAt:Date.now(),recordId:crypto.randomUUID?crypto.randomUUID():String(Date.now()),ended:false};
+  const rec={id:state.recordId,name,section:state.section,avatar:state.avatar,status:"Jugando 🟢",score:0,correct:"0/20",accuracy:0,start:nowText(new Date()),startMs:state.startedAt,duration:"—",end:"—"};
+  await hybridSave(rec);
+  $("hudName").textContent=name;$("hudAvatar").textContent=state.avatar;$("hudSection").textContent=`Sección ${state.section}`;hide("startScreen");show("quizScreen");renderQuestion();
+}
+function renderQuestion(){
+  const q=QUESTIONS[state.index];$("questionNumber").textContent=`Pregunta ${state.index+1} de ${QUESTIONS.length}`;$("progressText").textContent=`Progreso: ${state.index}/${QUESTIONS.length}`;
+  $("questionText").textContent=q.q;$("scoreText").textContent=Math.round(state.score);$("streakText").textContent=state.streak;$("fireIcon").classList.toggle("hiddenx",state.streak<3);
+  $("fiftyBtn").disabled=false;$("hintBtn").disabled=false;$("fiftyBtn").classList.remove("opacity-40");$("hintBtn").classList.remove("opacity-40");
+  $("hintBox").classList.add("hiddenx");$("feedback").classList.add("hiddenx");$("nextBtn").classList.add("hiddenx");
+  const box=$("options");box.innerHTML="";
+  q.o.forEach((opt,i)=>{const b=document.createElement("button");b.className="option glass-soft rounded-2xl p-4 text-left font-semibold flex gap-3 items-start";b.innerHTML=`<span class="font-black text-cyan-200">${String.fromCharCode(65+i)}.</span><span>${esc(opt)}</span>`;b.onclick=()=>answer(i,b);box.appendChild(b)})
+}
+async function answer(i,button){
+  if(button.disabled)return;
+  const q=QUESTIONS[state.index], buttons=[...$("options").querySelectorAll("button")];
+  buttons.forEach(b=>{b.disabled=true;b.classList.add("disabled")});
+  const ok=i===q.a;if(ok){state.streak++;state.correct++;button.classList.add("correct")}else{state.streak=0;button.classList.add("wrong");buttons[q.a].classList.add("correct")}
+  const pts=ok?100*(1+state.streak*.1):0;state.score+=pts;state.answers.push({q:state.index+1,selected:i,correct:ok,points:pts});
+  $("scoreText").textContent=Math.round(state.score);$("streakText").textContent=state.streak;$("fireIcon").classList.toggle("hiddenx",state.streak<3);
+  $("feedback").className=`mt-6 rounded-2xl p-5 border ${ok?"bg-emerald-400/15 border-emerald-200/30":"bg-red-400/15 border-red-200/30"}`;
+  $("feedback").innerHTML=`<div class="text-xl font-black">${ok?"✅ Correcto":"❌ Incorrecto"}</div><div class="mt-2 font-bold">Puntaje ganado: ${Math.round(pts)} pts</div><div class="mt-3"><b>Explicación:</b> ${esc(q.e)}</div>`;
+  show("feedback");show("nextBtn");
+  if(state.index===QUESTIONS.length-1){$("nextBtn").textContent="🏁 Ver resultados";$("nextBtn").onclick=finishGame}else{$("nextBtn").textContent="Siguiente ➜";$("nextBtn").onclick=()=>{state.index++;renderQuestion()}}
+  await updatePlayingRecord();
+}
+async function updatePlayingRecord(){
+  const r=records.find(x=>x.id===state.recordId);if(!r)return;
+  r.score=Math.round(state.score);r.correct=`${state.correct}/20`;r.accuracy=+(state.correct/20*100).toFixed(2);await hybridSave(r)
+}
+async function finishGame(){
+  if(state.ended)return;state.ended=true;const end=Date.now(),dur=end-state.startedAt;
+  const r=records.find(x=>x.id===state.recordId);
+  if(r){r.status="Terminado 🏆";r.score=Math.round(state.score);r.correct=`${state.correct}/20`;r.accuracy=+(state.correct/20*100).toFixed(2);r.end=nowText(new Date(end));r.duration=durationText(dur);await hybridSave(r);await sendResultToGoogleSheets(r)}
+  $("resultAvatar").textContent=state.avatar;$("resultName").textContent=state.name;$("resultSection").textContent=`🏫 Sección ${state.section}`;$("finalScore").textContent=Math.round(state.score);$("accuracy").textContent=`${(state.correct/20*100).toFixed(0)}%`;$("correctCount").textContent=`${state.correct}/20`;$("rankBadge").textContent=rank(state.correct/20*100);
+  hide("quizScreen");show("resultScreen");
+}
+async function abandon(){
+  const ok=await modal({title:"¿Abandonar el reto?",message:"Tu intento se registrará con estado “Abandonó ❌”. El progreso no podrá continuar desde esta partida.",icon:"⚠️",okText:"Abandonar",cancel:true});
+  if(ok!==null){const r=records.find(x=>x.id===state.recordId);if(r){r.status="Abandonó ❌";r.score=Math.round(state.score);r.correct=`${state.correct}/20`;r.accuracy=+(state.correct/20*100).toFixed(2);r.end=nowText(new Date());r.duration=durationText(Date.now()-state.startedAt);await hybridSave(r)}state.ended=true;hide("quizScreen");show("startScreen")}
+}
+function openTheory(ref){
+  show("theoryModal");
+  setTimeout(()=>{if(ref){const el=$(ref);if(el){document.querySelectorAll(".smart-highlight").forEach(x=>x.classList.remove("smart-highlight","fade-highlight"));el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("smart-highlight","fade-highlight");setTimeout(()=>el.classList.remove("smart-highlight","fade-highlight"),3100)}}},80)
+}
+function reportText(){
+  return `🛡️ QUIZ EDA N.º 05 — ESPACIOS SEGUROS
+👤 Estudiante: ${state.name}
+🏫 Sección: ${state.section}
+${state.avatar} Avatar: ${state.avatar}
+⭐ Puntaje: ${Math.round(state.score)} pts
+🎯 Aciertos: ${state.correct}/20
+📊 Precisión: ${(state.correct/20*100).toFixed(0)}%
+🏅 Rango: ${rank(state.correct/20*100)}
+📚 Tema: Figuras Geométricas y Cuerpos en el Espacio
+I.E.E. “JOSE DE SAN MARTIN” — Quinto Año`;
+}
+async function teacherLogin(){
+  const pass=await modal({title:"Acceso Docente",message:"Ingresa la contraseña fija para abrir el panel.",icon:"🔐",input:true,type:"password",okText:"Ingresar"});
+  if(pass==="1236"){renderRecords();show("teacherModal")}else if(pass!==null){await modal({title:"Acceso denegado",message:"La contraseña no coincide.",icon:"⛔"})}
+}
+function renderRecords(){
+  const arr=[...records].sort((a,b)=>(a.status.startsWith("Jugando")?0:1)-(b.status.startsWith("Jugando")?0:1)||Number(b.score)-Number(a.score));
+  $("recordsBody").innerHTML=arr.length?arr.map(r=>`<tr><td>${esc(r.status)}</td><td>${esc(r.name)}</td><td><b>${esc(r.section||"A")}</b></td><td class="text-2xl">${esc(r.avatar)}</td><td>${esc(r.score)}</td><td>${esc(r.correct)}</td><td>${esc(r.accuracy)}%</td><td>${esc(r.start)}</td><td>${esc(r.duration)}</td></tr>`).join(""):`<tr><td colspan="9" class="text-center text-slate-300 py-8">No hay registros.</td></tr>`;
+}
+$("sectionGrid").addEventListener("click",e=>{
+  const b=e.target.closest("[data-section]"); if(!b)return;
+  document.querySelectorAll(".section-btn").forEach(x=>x.classList.remove("selected-section"));
+  b.classList.add("selected-section");
+  state.section=b.dataset.section;
+  $("selectedSectionText").textContent=state.section;
+});
+$("avatarGrid").addEventListener("click",e=>{const b=e.target.closest("[data-avatar]");if(!b)return;document.querySelectorAll(".avatar").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");state.avatar=b.dataset.avatar});
+$("studyBtn").onclick=()=>openTheory(null);
+$("startBtn").onclick=startGame;
+$("teacherBtn").onclick=teacherLogin;
+$("closeTheoryBtn").onclick=()=>hide("theoryModal");
+$("theoryQuizBtn").onclick=()=>openTheory(QUESTIONS[state.index].ref);
+$("quitBtn").onclick=abandon;
+$("fiftyBtn").onclick=async()=>{
+  if($("fiftyBtn").disabled)return;
+  const q=QUESTIONS[state.index],buttons=[...$("options").querySelectorAll("button")],wrong=q.o.map((_,i)=>i).filter(i=>i!==q.a);
+  wrong.sort(()=>Math.random()-.5).slice(0,2).forEach(i=>{buttons[i].disabled=true;buttons[i].classList.add("opacity-30")});
+  $("fiftyBtn").disabled=true;$("fiftyBtn").classList.add("opacity-40");
+};
+$("hintBtn").onclick=async()=>{
+  if($("hintBtn").disabled)return;
+  $("hintBox").textContent="💡 Pista: "+QUESTIONS[state.index].h;show("hintBox");$("hintBtn").disabled=true;$("hintBtn").classList.add("opacity-40");
+};
+$("copyReportBtn").onclick=async()=>{try{await navigator.clipboard.writeText(reportText());await modal({title:"Reporte copiado",message:"El reporte quedó listo para pegar en WhatsApp u otro medio.",icon:"📋"})}catch{await modal({title:"Copia manual",message:reportText(),icon:"📄"})}};
+$("homeBtn").onclick=()=>{hide("resultScreen");show("startScreen")};
+$("closeTeacherBtn").onclick=()=>hide("teacherModal");
+$("clearRecordsBtn").onclick=async()=>{const ok=await modal({title:"Borrar todos los registros",message:"Esta acción eliminará los registros guardados localmente en este navegador.",icon:"🗑️",okText:"Borrar"});if(ok!==null){await hybridDeleteAll();renderRecords()}};
+$("theoryModal").addEventListener("click",e=>{if(e.target.id==="theoryModal")hide("theoryModal")});
+$("teacherModal").addEventListener("click",e=>{if(e.target.id==="teacherModal")hide("teacherModal")});
+window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("theoryModal").classList.contains("hiddenx"))hide("theoryModal");else if(!$("teacherModal").classList.contains("hiddenx"))hide("teacherModal")}});
+loadLocal();
+</script>
+</body>
+</html>
